@@ -1,21 +1,21 @@
 /* eslint-disable class-methods-use-this */
 import { Request, Response } from 'express';
+import { getCustomRepository } from 'typeorm';
 
 import Employeer from '../models/Employeer';
 import EmployeersRepository from '../repositories/EmployeersRepository';
 import CreateEmployeerService from '../services/CreateEmployeerService';
 
-const employeersRepository = new EmployeersRepository();
-const createEmployeerService = new CreateEmployeerService(employeersRepository);
-
 export default class EmployeersControllers {
   public async index(request: Request, response: Response): Promise<Response> {
-    const listEmployeers = employeersRepository.all();
+    const employeersRepository = getCustomRepository(EmployeersRepository);
+    const listEmployeers = await employeersRepository.find();
 
     return response.json(listEmployeers);
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
+    const createEmployeerService = new CreateEmployeerService();
     const {
       fullName,
       cpf,
@@ -27,7 +27,7 @@ export default class EmployeersControllers {
     }: Employeer = request.body;
 
     try {
-      const createEmployeer = createEmployeerService.execute({
+      const createEmployeer = await createEmployeerService.execute({
         fullName,
         cpf,
         adress,

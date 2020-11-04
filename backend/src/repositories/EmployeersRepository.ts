@@ -1,40 +1,14 @@
+import { EntityRepository, Repository } from 'typeorm';
 import Employeer from '../models/Employeer';
 
-interface CreateEmployeerDTO {
-  fullName: string;
-  cpf: number;
-  adress: string;
-  number: number;
-  city: string;
-  borne: string;
-  subsidiary: string;
-}
+@EntityRepository(Employeer)
+class EmployeersRepository extends Repository<Employeer> {
+  public async findCPF(cpf: string): Promise<Employeer | null> {
+    const cpfExist = await this.findOne({
+      where: { cpf },
+    });
 
-class EmployeersRepository {
-  private employeers: Employeer[];
-
-  constructor() {
-    this.employeers = [];
-  }
-
-  public all(): Employeer[] {
-    return this.employeers;
-  }
-
-  public create(data: CreateEmployeerDTO): Employeer {
-    const employeer = new Employeer(data);
-
-    this.employeers.push(employeer);
-
-    return employeer;
-  }
-
-  public findCPF(cpf: number): Employeer | undefined {
-    const employeerExist = this.employeers.find(
-      employeer => employeer.cpf === cpf,
-    );
-
-    return employeerExist;
+    return cpfExist || null;
   }
 }
 

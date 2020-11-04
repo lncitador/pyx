@@ -1,40 +1,42 @@
-import { v4 } from 'uuid';
+/* eslint-disable camelcase */
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
+@Entity('employeers')
 class Employeer {
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
   fullName: string;
 
-  cpf: number;
+  @Column()
+  cpf: string;
 
+  @Column()
   adress: string;
 
+  @Column('integer')
   number: number;
 
+  @Column()
   city: string;
 
+  @Column()
   borne: string;
 
+  @Column()
   subsidiary: string;
 
-  constructor({
-    fullName,
-    cpf,
-    adress,
-    number,
-    city,
-    borne,
-    subsidiary,
-  }: Omit<Employeer, 'id'>) {
-    this.id = v4();
-    this.fullName = fullName;
-    this.cpf = cpf;
-    this.adress = adress;
-    this.number = number;
-    this.city = city;
-    this.borne = borne;
-    this.subsidiary = subsidiary;
-  }
+  @CreateDateColumn()
+  created_at: Date;
+
+  @CreateDateColumn()
+  updated_at: Date;
 }
 
 export default Employeer;
