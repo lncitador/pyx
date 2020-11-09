@@ -1,13 +1,5 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-//       fullName,
-//       cpf,
-//       adress,
-//       number,
-//       city,
-//       borne,
-//       subsidiary,
-
 export default class CreateEmployeers1604375061902
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -25,37 +17,31 @@ export default class CreateEmployeers1604375061902
           {
             name: 'fullName',
             type: 'varchar',
-            isNullable: false,
           },
           {
             name: 'cpf',
             type: 'varchar',
-            isNullable: false,
+            isUnique: true,
           },
           {
             name: 'adress',
             type: 'varchar',
-            isNullable: false,
           },
           {
             name: 'number',
             type: 'int',
-            isNullable: false,
           },
           {
             name: 'city',
             type: 'varchar',
-            isNullable: false,
           },
           {
             name: 'borne',
             type: 'varchar',
-            isNullable: false,
           },
           {
             name: 'subsidiary',
             type: 'varchar',
-            isNullable: false,
           },
           {
             name: 'created_at',

@@ -15,6 +15,7 @@ export default class EmployeersControllers {
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
+    const createHashService = new createHashService();
     const createEmployeerService = new CreateEmployeerService();
     const {
       fullName,

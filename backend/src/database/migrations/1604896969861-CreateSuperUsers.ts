@@ -1,10 +1,11 @@
 import { MigrationInterface, QueryRunner, Table } from 'typeorm';
 
-export default class CreateAdmins1604680803762 implements MigrationInterface {
+export default class CreateSuperUsers1604896969861
+  implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'admins',
+        name: 'superuser',
         columns: [
           {
             name: 'id',
@@ -16,6 +17,11 @@ export default class CreateAdmins1604680803762 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
+          },
+          {
+            name: 'email',
+            type: 'varchar',
+            isUnique: true,
           },
           {
             name: 'password',
@@ -37,6 +43,6 @@ export default class CreateAdmins1604680803762 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('admins');
+    await queryRunner.dropTable('superuser');
   }
 }
