@@ -4,7 +4,7 @@ import SuperUser from '../models/SuperUser';
 import CreateHashService from '../services/CreateHashService';
 
 export default class SuperUserController {
-  async create(request: Request, response: Response): Promise<Response> {
+  public async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
 
     const superUserRepository = getRepository(SuperUser);
