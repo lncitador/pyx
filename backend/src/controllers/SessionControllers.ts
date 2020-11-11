@@ -7,19 +7,14 @@ export default class SessionController {
     const authenticateUser = new AuthenticateUserService();
     const { email, password } = request.body;
 
-    try {
-      const { name, id } = await authenticateUser.execute({
-        email,
-        password,
-      });
+    const { user, token } = await authenticateUser.execute({
+      email,
+      password,
+    });
 
-      return response.json({
-        id,
-        name,
-        email,
-      });
-    } catch (error) {
-      return response.status(400).json({ error: error.message });
-    }
+    return response.json({
+      user,
+      token,
+    });
   }
 }

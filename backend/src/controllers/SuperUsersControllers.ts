@@ -1,26 +1,26 @@
 import { Request, Response } from 'express';
-import { getRepository } from 'typeorm';
-import SuperUser from '../models/SuperUser';
-import CreateHashService from '../services/CreateHashService';
+import CreateSuperUserService from '../services/CreateSuperUserService';
 
 export default class SuperUserController {
   public async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
 
-    const superUserRepository = getRepository(SuperUser);
+    const createSuperUserService = new CreateSuperUserService();
 
-    const createHashService = new CreateHashService();
-
-    const hashedPassword = await createHashService.execute({ password });
-
-    const createSuperUser = await superUserRepository.create({
+    const createSuperUser = await createSuperUserService.execute({
       name,
       email,
-      password: hashedPassword,
+      password,
     });
 
-    await superUserRepository.save(createSuperUser);
+    const user = {
+      id: createSuperUser.id,
+      name: createSuperUser.name,
+      email: createSuperUser.email,
+      created_at: createSuperUser.created_at,
+      updated_at: createSuperUser.updated_at,
+    };
 
-    return response.json(createSuperUser);
+    return response.json(user);
   }
 }

@@ -15,7 +15,6 @@ export default class EmployeersControllers {
   }
 
   public async create(request: Request, response: Response): Promise<Response> {
-    const createHashService = new createHashService();
     const createEmployeerService = new CreateEmployeerService();
     const {
       fullName,
@@ -27,20 +26,16 @@ export default class EmployeersControllers {
       subsidiary,
     }: Employeer = request.body;
 
-    try {
-      const createEmployeer = await createEmployeerService.execute({
-        fullName,
-        cpf,
-        adress,
-        number,
-        city,
-        borne,
-        subsidiary,
-      });
+    const createEmployeer = await createEmployeerService.execute({
+      fullName,
+      cpf,
+      adress,
+      number,
+      city,
+      borne,
+      subsidiary,
+    });
 
-      return response.json(createEmployeer);
-    } catch (error) {
-      return response.status(400).json({ error: error.message });
-    }
+    return response.json(createEmployeer);
   }
 }

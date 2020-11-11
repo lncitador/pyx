@@ -1,13 +1,26 @@
 import { compare } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
+import auth from '../config/auth';
+import AppError from '../errors/AppError';
 import SuperUser from '../models/SuperUser';
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 interface Request {
   email: string;
   password: string;
 }
+
+interface Response {
+  user: User;
+  token: string;
+}
 export default class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<SuperUser> {
+  public async execute({ email, password }: Request): Promise<Response> {
     const superUserRepository = getRepository(SuperUser);
 
     const superUser = await superUserRepository.findOne({
@@ -15,15 +28,31 @@ export default class AuthenticateUserService {
     });
 
     if (!superUser) {
-      throw new Error('Bad combination');
+      throw new AppError('Bad combination');
     }
 
     const passwordCheck = compare(password, superUser.password);
 
     if (!passwordCheck) {
-      throw new Error('Bad combination');
+      throw new AppError('Bad combination');
     }
 
-    return superUser;
+    const user: User = {
+      id: superUser.id,
+      name: superUser.name,
+      email,
+    };
+
+    const { secret, expiresIn } = auth.jwt;
+
+    const token = sign({}, secret, {
+      subject: user.id,
+      expiresIn,
+    });
+
+    return {
+      user,
+      token,
+    };
   }
 }

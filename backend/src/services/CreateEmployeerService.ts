@@ -1,4 +1,5 @@
 import { getCustomRepository } from 'typeorm';
+import AppError from '../errors/AppError';
 import Employeer from '../models/Employeer';
 import EmployeersRepository from '../repositories/EmployeersRepository';
 
@@ -18,7 +19,7 @@ class CreateEmployeerService {
     const employeerExist = await employeersRepository.findCPF(data.cpf);
 
     if (employeerExist) {
-      throw Error('cpf already exist');
+      throw new AppError('cpf already exist');
     }
 
     const employeer = employeersRepository.create(data);
