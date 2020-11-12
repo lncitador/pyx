@@ -1,17 +1,13 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 
 import CreateAdminService from '@modules/admin/services/CreateAdminService';
 
-interface IRequest {
-  name: string;
-  password: string;
-}
-
 export default class AdminsControllers {
   public async create(request: Request, response: Response): Promise<Response> {
-    const createAdminService = new CreateAdminService();
+    const createAdminService = container.resolve(CreateAdminService);
 
-    const { name, password }: IRequest = request.body;
+    const { name, password } = request.body;
 
     const createAdmin = await createAdminService.execute({
       name,

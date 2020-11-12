@@ -1,18 +1,17 @@
-import { getRepository } from 'typeorm';
+import { inject, injectable } from 'tsyringe';
+import ICreatedAdminDTO from '../dtos/ICreateAdminDTO';
 import Admins from '../infra/typeorm/entities/Admins';
+import IAdminRepository from '../repositories/IAdminRepository';
 
-interface Request {
-  name: string;
-  password: string;
-}
-
+@injectable()
 class CreateAdminService {
-  public async execute(data: Request): Promise<Admins> {
-    const adminRepository = getRepository(Admins);
+  constructor(
+    @inject('AdminRepository')
+    private adminRepository: IAdminRepository,
+  ) {}
 
-    const admin = adminRepository.create(data);
-
-    await adminRepository.save(admin);
+  public async execute({ name, password }: ICreatedAdminDTO): Promise<Admins> {
+    const admin = await this.adminRepository.create({ name, password });
 
     return admin;
   }

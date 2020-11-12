@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import CreateSuperUserService from '@modules/superusers/services/CreateSuperUserService';
 
 export default class SuperUserController {
   public async create(request: Request, response: Response): Promise<Response> {
     const { name, email, password } = request.body;
 
-    const createSuperUserService = new CreateSuperUserService();
+    const createSuperUserService = container.resolve(CreateSuperUserService);
 
     const createSuperUser = await createSuperUserService.execute({
       name,

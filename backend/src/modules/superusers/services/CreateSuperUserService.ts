@@ -1,37 +1,32 @@
-import { getRepository } from 'typeorm';
-import AppError from '@shared/errors/AppError';
-import CreateHashService from '@shared/services/CreateHashService';
+import { inject, injectable } from 'tsyringe';
 import SuperUser from '../infra/typeorm/entities/SuperUser';
+import ISuperUsersRepository from '../repositories/ISuperUsersRepository';
 
-interface Request {
+interface IRequest {
   name: string;
   email: string;
   password: string;
 }
 
+@injectable()
 class CreateSuperUserService {
-  public async execute({ name, email, password }: Request): Promise<SuperUser> {
-    const superUserRepository = getRepository(SuperUser);
-    const superUserExist = await superUserRepository.findOne({
-      where: { email },
-    });
+  constructor(
+    @inject('SuperUsersRepository')
+    private superUsersRepository: ISuperUsersRepository,
+  ) {}
 
-    if (superUserExist) {
-      throw new AppError('email has already been registered');
-    }
-    const createHashService = new CreateHashService();
-
-    const hashedPassword = await createHashService.execute({ password });
-
-    const createSuperUser = await superUserRepository.create({
+  public async execute({
+    name,
+    email,
+    password,
+  }: IRequest): Promise<SuperUser> {
+    const superUser = await this.superUsersRepository.create({
       name,
       email,
-      password: hashedPassword,
+      password,
     });
 
-    await superUserRepository.save(createSuperUser);
-
-    return createSuperUser;
+    return superUser;
   }
 }
 

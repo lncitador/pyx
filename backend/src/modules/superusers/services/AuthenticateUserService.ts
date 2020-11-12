@@ -1,31 +1,34 @@
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
-import { getRepository } from 'typeorm';
 import auth from '@config/auth';
 import AppError from '@shared/errors/AppError';
-import SuperUser from '../infra/typeorm/entities/SuperUser';
+import { inject, injectable } from 'tsyringe';
+import ISuperUsersRepository from '../repositories/ISuperUsersRepository';
 
-interface User {
+interface IUser {
   id: string;
   name: string;
   email: string;
 }
-interface Request {
+interface IRequest {
   email: string;
   password: string;
 }
 
-interface Response {
-  user: User;
+interface IResponse {
+  user: IUser;
   token: string;
 }
-export default class AuthenticateUserService {
-  public async execute({ email, password }: Request): Promise<Response> {
-    const superUserRepository = getRepository(SuperUser);
 
-    const superUser = await superUserRepository.findOne({
-      where: { email },
-    });
+@injectable()
+export default class AuthenticateUserService {
+  constructor(
+    @inject('SuperUsersRepository')
+    private superUserRepository: ISuperUsersRepository,
+  ) {}
+
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
+    const superUser = await this.superUserRepository.findMail(email);
 
     if (!superUser) {
       throw new AppError('Bad combination');
@@ -37,7 +40,7 @@ export default class AuthenticateUserService {
       throw new AppError('Bad combination');
     }
 
-    const user: User = {
+    const user: IUser = {
       id: superUser.id,
       name: superUser.name,
       email,

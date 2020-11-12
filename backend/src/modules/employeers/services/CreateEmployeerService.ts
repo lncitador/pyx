@@ -1,9 +1,9 @@
-import { getCustomRepository } from 'typeorm';
 import AppError from '@shared/errors/AppError';
+import { inject, injectable } from 'tsyringe';
 import Employeer from '../infra/typeorm/entities/Employeer';
-import EmployeersRepository from '../infra/typeorm/repositories/EmployeersRepository';
+import IEmployeersRepository from '../repositories/IEmployeersRepository';
 
-interface Request {
+interface IRequest {
   fullName: string;
   cpf: string;
   adress: string;
@@ -13,20 +13,23 @@ interface Request {
   subsidiary: string;
 }
 
+@injectable()
 class CreateEmployeerService {
-  public async execute(data: Request): Promise<Employeer> {
-    const employeersRepository = getCustomRepository(EmployeersRepository);
-    const employeerExist = await employeersRepository.findCPF(data.cpf);
+  constructor(
+    @inject('EmployeersRepository')
+    public employeersRepository: IEmployeersRepository,
+  ) {}
 
-    if (employeerExist) {
+  public async execute(data: IRequest): Promise<Employeer> {
+    const employeer = await this.employeersRepository.findCPF(data.cpf);
+
+    if (employeer) {
       throw new AppError('cpf already exist');
     }
 
-    const employeer = employeersRepository.create(data);
+    const createEmployeer = await this.employeersRepository.create(data);
 
-    await employeersRepository.save(employeer);
-
-    return employeer;
+    return createEmployeer;
   }
 }
 
