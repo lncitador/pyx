@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import CreateAdminService from '../services/CreateAdminService';
+import CreateAdminService from '@modules/admin/services/CreateAdminService';
 
 interface IRequest {
   name: string;

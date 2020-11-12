@@ -1,9 +1,9 @@
 import { Router } from 'express';
+import adminsRouter from '@modules/admin/infra/http/routes/admin.routes';
+import employeersRouter from '@modules/employeers/infra/http/routes/employeer.routes';
+import sessionRouter from '@modules/superusers/infra/http/routes/session.routes';
+import superUserRouter from '@modules/superusers/infra/http/routes/superUser.routes';
 import ensureAuthenticated from '../middlewares/ensureAuthenticated';
-import adminsRouter from './admin.routes';
-import employeersRouter from './employeer.routes';
-import sessionRouter from './session.routes';
-import superUserRouter from './superUser.routes';
 
 const routes = Router();
 

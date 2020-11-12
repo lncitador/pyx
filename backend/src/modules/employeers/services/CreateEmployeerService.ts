@@ -1,7 +1,7 @@
 import { getCustomRepository } from 'typeorm';
-import AppError from '../errors/AppError';
-import Employeer from '../models/Employeer';
-import EmployeersRepository from '../repositories/EmployeersRepository';
+import AppError from '@shared/errors/AppError';
+import Employeer from '../infra/typeorm/entities/Employeer';
+import EmployeersRepository from '../infra/typeorm/repositories/EmployeersRepository';
 
 interface Request {
   fullName: string;

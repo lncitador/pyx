@@ -1,9 +1,9 @@
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { getRepository } from 'typeorm';
-import auth from '../config/auth';
-import AppError from '../errors/AppError';
-import SuperUser from '../models/SuperUser';
+import auth from '@config/auth';
+import AppError from '@shared/errors/AppError';
+import SuperUser from '../infra/typeorm/entities/SuperUser';
 
 interface User {
   id: string;

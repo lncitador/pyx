@@ -2,9 +2,9 @@
 import { Request, Response } from 'express';
 import { getCustomRepository } from 'typeorm';
 
-import Employeer from '../models/Employeer';
-import EmployeersRepository from '../repositories/EmployeersRepository';
-import CreateEmployeerService from '../services/CreateEmployeerService';
+import Employeer from '@modules/employeers/infra/typeorm/entities/Employeer';
+import EmployeersRepository from '@modules/employeers/infra/typeorm/repositories/EmployeersRepository';
+import CreateEmployeerService from '@modules/employeers/services/CreateEmployeerService';
 
 export default class EmployeersControllers {
   public async index(request: Request, response: Response): Promise<Response> {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import CreateSuperUserService from '../services/CreateSuperUserService';
+import CreateSuperUserService from '@modules/superusers/services/CreateSuperUserService';
 
 export default class SuperUserController {
   public async create(request: Request, response: Response): Promise<Response> {

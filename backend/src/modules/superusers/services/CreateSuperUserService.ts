@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
-import AppError from '../errors/AppError';
-import SuperUser from '../models/SuperUser';
-import CreateHashService from './CreateHashService';
+import AppError from '@shared/errors/AppError';
+import CreateHashService from '@shared/services/CreateHashService';
+import SuperUser from '../infra/typeorm/entities/SuperUser';
 
 interface Request {
   name: string;

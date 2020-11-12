@@ -1,5 +1,5 @@
 import { getRepository } from 'typeorm';
-import Admins from '../models/Admins';
+import Admins from '../infra/typeorm/entities/Admins';
 
 interface Request {
   name: string;
