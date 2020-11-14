@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export default class CreateVehicle1605330358400 implements MigrationInterface {
+export default class CreateSurvey1605361401517 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'vehicle',
+        name: 'survey',
         columns: [
           {
             name: 'id',
@@ -19,17 +19,18 @@ export default class CreateVehicle1605330358400 implements MigrationInterface {
             default: 'uuid_generate_v4()',
           },
           {
-            name: 'plate',
-            type: 'varchar',
-          },
-          {
-            name: 'driver',
-            type: 'varchar',
-          },
-          {
-            name: 'carrier_id',
+            name: 'vehicle_id',
             type: 'uuid',
             isNullable: true,
+          },
+          {
+            name: 'last_survey',
+            type: 'timestamp with time zone',
+            isNullable: true,
+          },
+          {
+            name: 'note',
+            type: 'varchar',
           },
           {
             name: 'created_at',
@@ -46,18 +47,18 @@ export default class CreateVehicle1605330358400 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'vehicle',
+      'survey',
       new TableForeignKey({
-        name: 'TranscarrierVehicle',
-        columnNames: ['carrier_id'],
+        name: 'VehicleSurvey',
+        columnNames: ['vehicle_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'carrier',
+        referencedTableName: 'vehicle',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropForeignKey('vehicle', 'TranscarrierVehicle');
-    await queryRunner.dropTable('vehicle');
+    await queryRunner.dropForeignKey('survey', 'VehicleSurvey');
+    await queryRunner.dropTable('survey');
   }
 }

@@ -35,6 +35,6 @@ app.get('/', (request, response) => {
   });
 });
 
-app.listen(3434, () => {
-  console.log('🚀 Server started on http://localhost:3434');
+app.listen(3435, () => {
+  console.log('🚀 Server started on http://localhost:3435');
 });
