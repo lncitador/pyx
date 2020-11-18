@@ -1,6 +1,8 @@
 /* eslint-disable no-console */
 import 'reflect-metadata';
 import express, { NextFunction, Request, Response } from 'express';
+import cors from 'cors';
+import shell from 'shelljs';
 import 'express-async-errors';
 import AppError from '@shared/errors/AppError';
 import routes from './routes';
@@ -9,6 +11,8 @@ import '@shared/infra/typeorm';
 import '@shared/container';
 
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 app.use(routes);
@@ -35,6 +39,10 @@ app.get('/', (request, response) => {
   });
 });
 
-app.listen(3434, () => {
-  console.log('🚀 Server started on http://localhost:3434');
-});
+// Run external tool synchronously
+if (shell.exec('npm run typeorm migration:run').code !== 0) {
+  shell.echo('error');
+  shell.exit(1);
+}
+
+app.listen(3434);
