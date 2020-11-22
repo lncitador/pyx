@@ -1,3 +1,4 @@
+import CreateRegistry from '@modules/employeers/provider/registry';
 import IEmployeersRepository from '@modules/employeers/repositories/IEmployeersRepository';
 import { getRepository, Repository } from 'typeorm';
 import Employeer from '../entities/Employeer';
@@ -27,8 +28,22 @@ class EmployeersRepository implements IEmployeersRepository {
     return cpfExist || undefined;
   }
 
+  public async findRegistry(registry: string): Promise<Employeer | undefined> {
+    const registryExist = await this.ormRepository.findOne({
+      where: { registry },
+    });
+
+    return registryExist || undefined;
+  }
+
   public async create(data: IRequest): Promise<Employeer> {
     const employeer = this.ormRepository.create(data);
+
+    const createRegistry = new CreateRegistry();
+
+    const registry = await createRegistry.execute();
+
+    employeer.registry = registry;
 
     await this.ormRepository.save(employeer);
 

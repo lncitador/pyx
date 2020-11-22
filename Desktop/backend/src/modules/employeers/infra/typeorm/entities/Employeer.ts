@@ -12,6 +12,9 @@ class Employeer {
   id: string;
 
   @Column()
+  registry: string;
+
+  @Column()
   fullName: string;
 
   @Column()

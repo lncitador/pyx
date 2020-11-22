@@ -1,11 +1,11 @@
 import { hash } from 'bcryptjs';
 
-interface Request {
+interface IRequest {
   password: string;
 }
 
 class CreateHashService {
-  public async execute({ password }: Request): Promise<string> {
+  public async execute({ password }: IRequest): Promise<string> {
     const hashedPassword = await hash(password, 8);
 
     return hashedPassword;

@@ -12,6 +12,7 @@ interface IRequest {
 
 export default interface IEmployeersRepository {
   findCPF(cpf: string): Promise<Employeer | undefined>;
+  findRegistry(registry: string): Promise<Employeer | undefined>;
   create(data: IRequest): Promise<Employeer>;
   all(): Promise<Employeer[]>;
 }
