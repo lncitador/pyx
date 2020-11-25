@@ -4,7 +4,6 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  View,
   ScrollView,
   TextInput,
   Alert,
@@ -14,7 +13,7 @@ import { Form } from '@unform/mobile';
 import { FormHandles } from '@unform/core';
 import * as Yup from 'yup';
 
-import { Container, Title, ForgotPassword, ForgotPasswordtext } from './styles';
+import { Container, ForgotPassword, ForgotPasswordtext } from './styles';
 
 import getValidationErrors from '../../../utils/getValidationError';
 
@@ -77,16 +76,13 @@ const SingIn: React.FC = () => {
           contentContainerStyle={{ flex: 1 }}
           keyboardShouldPersistTaps="handled">
           <Container>
-            <Image source={imgPng} />
-            <View>
-              <Title>Digite o ID e senha pra entrar</Title>
-            </View>
-
+            <Image style={{ marginBottom: 50 }} source={imgPng} />
             <Form ref={formRef} onSubmit={handleSingIn}>
               <Input
                 autoCorrect={false}
                 autoCapitalize="none"
                 name="registry"
+                label="Digite o ID e senha pra entrar"
                 icon="user"
                 placeholder="ID ou Matricula"
                 returnKeyType="next"

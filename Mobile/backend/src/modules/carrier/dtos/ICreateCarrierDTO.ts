@@ -1,7 +1,8 @@
 export default interface ICreatedCarrierDTO {
-  name: string;
+  name?: string;
+  cnpj: string;
   responsible?: string;
   email?: string;
-  adress?: string;
-  phone?: number;
+  address?: string;
+  phone?: string;
 }

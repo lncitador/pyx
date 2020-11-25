@@ -12,16 +12,18 @@ class CreateCarrierService {
 
   public async execute({
     name,
+    cnpj,
     responsible,
     email,
-    adress,
+    address,
     phone,
   }: ICreatedCarrierDTO): Promise<Carrier> {
     const carrier = await this.carrierRepository.create({
       name,
+      cnpj,
       responsible,
       email,
-      adress,
+      address,
       phone,
     });
 

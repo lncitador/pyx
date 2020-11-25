@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import ICreatedCarrierDTO from '@modules/carrier/dtos/ICreateCarrierDTO';
 import ICarrierRepository from '@modules/carrier/repositories/ICarrierRepository';
 import { getRepository, Repository } from 'typeorm';
@@ -12,39 +13,55 @@ export default class CarrierRepository implements ICarrierRepository {
 
   public async showCarriers(): Promise<Carrier[]> {
     const carriers = await this.ormRepository.find({ relations: ['vehicles'] });
-    return carriers;
+
+    const carriersParsed: Carrier[] = [];
+
+    for (let i = 0; i < carriers.length; i++) {
+      const carrier = carriers[i];
+      carrier.address = carrier.address
+        ? JSON.parse(carrier.address)
+        : carrier.address;
+
+      carriersParsed.push(carrier);
+    }
+    return carriersParsed;
   }
 
   public async create({
     name,
+    cnpj,
     responsible,
     email,
-    adress,
+    address,
     phone,
   }: ICreatedCarrierDTO): Promise<Carrier> {
     const data = {
       name,
+      cnpj,
       responsible,
       email,
-      adress,
+      address,
       phone,
     };
 
     const carrier = await this.ormRepository.findOne({
-      where: { name },
+      where: { cnpj },
     });
 
     if (!carrier) {
       const createCarrier = this.ormRepository.create(data);
+      createCarrier.address = address ? JSON.parse(address) : address;
 
       await this.ormRepository.save(createCarrier);
+
       return createCarrier;
     }
 
     carrier.responsible = responsible;
     carrier.email = email;
-    carrier.adress = adress;
     carrier.phone = phone;
+    carrier.address = address;
+    carrier.address = address ? JSON.parse(address) : address;
 
     await this.ormRepository.save(carrier);
 

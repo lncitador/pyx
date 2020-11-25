@@ -8,18 +8,24 @@ import React, {
 
 import AsyncStorage from '@react-native-community/async-storage';
 
-import api from '../services/api';
+import {
+  mobile,
+  pyxapi,
+  VehicleResponseData,
+  CarrierResponseData,
+} from '../services/UseApi';
 
 interface SingInCredentials {
   registry: string;
   cpf: string;
 }
-
 interface AuthContextData {
   user: object;
+  vehicle: VehicleResponseData;
   loading: boolean;
   singIn(credentials: SingInCredentials): Promise<void>;
   singOut(): void;
+  findPlate(plate: string): Promise<void>;
 }
 
 interface AuthState {
@@ -27,10 +33,17 @@ interface AuthState {
   user: object;
 }
 
+interface SurveyState {
+  plate: string;
+  driver: string;
+  carrier: CarrierResponseData;
+}
+
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 export const AuthUser: React.FC = ({ children }) => {
   const [data, setData] = useState<AuthState>({} as AuthState);
+  const [survey, setSurvey] = useState<SurveyState>({} as SurveyState);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,12 +63,10 @@ export const AuthUser: React.FC = ({ children }) => {
   }, []);
 
   const singIn = useCallback(async ({ registry, cpf }) => {
-    const response = await api.post('mobile', {
+    const response = await pyxapi.post('mobile', {
       registry,
       cpf,
     });
-
-    console.log(response);
 
     const { token, user } = response.data;
 
@@ -64,9 +75,29 @@ export const AuthUser: React.FC = ({ children }) => {
       ['@PyxApp:user', JSON.stringify(user)],
     ]);
 
-    api.defaults.headers.authorization = `Bearer ${token[1]}`;
+    pyxapi.defaults.headers.authorization = `Bearer ${token[1]}`;
 
     setData({ token, user });
+  }, []);
+
+  const findPlate = useCallback(async (plate) => {
+    const vehicle = await mobile.get<VehicleResponseData>(`vehicle/${plate}`);
+
+    const { driver, carrier } = vehicle.data;
+
+    await AsyncStorage.multiSet([
+      ['@PyxApp:plate', plate],
+      ['@PyxApp:driver', driver],
+      ['@PyxApp:carrier', JSON.stringify(carrier)],
+    ]);
+
+    setSurvey({ plate, driver, carrier });
+    // const [getPlate, getDriver, getCarrier] = await AsyncStorage.multiGet([
+    //   '@PyxApp:plate',
+    //   '@PyxApp:driver',
+    //   '@PyxApp:carrier',
+    // ]);
+    console.log(carrier);
   }, []);
 
   const singOut = useCallback(async () => {
@@ -79,9 +110,11 @@ export const AuthUser: React.FC = ({ children }) => {
     <AuthContext.Provider
       value={{
         user: data.user,
+        vehicle: survey,
         loading,
         singIn,
         singOut,
+        findPlate,
       }}>
       {children}
     </AuthContext.Provider>

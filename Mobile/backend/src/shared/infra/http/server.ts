@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import 'reflect-metadata';
+import dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
 import 'express-async-errors';
 import cors from 'cors';
@@ -9,6 +10,8 @@ import routes from './routes';
 
 import '@shared/infra/typeorm';
 import '@shared/container';
+
+dotenv.config();
 
 const app = express();
 
@@ -39,10 +42,12 @@ app.get('/', (request, response) => {
   });
 });
 
-// Run external tool synchronously
-if (shell.exec('npm run typeorm migration:run').code !== 0) {
-  shell.echo('error');
-  shell.exit(1);
+if (process.env.POSTGRES_HOST === 'pyxmobile') {
+  // Run external tool synchronously
+  if (shell.exec('npm run typeorm migration:run').code !== 0) {
+    shell.echo('error');
+    shell.exit(1);
+  }
 }
 
 app.listen(3435);

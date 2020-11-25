@@ -1,10 +1,10 @@
-{
+module.exports = {
     "type": "postgres",
-    "host": "surveydb",
+    "host": process.env.POSTGRES_HOST,
     "port": 5432,
     "username": "postgres",
     "password": "docker",
-    "database": "survey",
+    "database": "desktop",
     "entities": [
         "./src/modules/*/infra/typeorm/entities/*.ts"
     ],

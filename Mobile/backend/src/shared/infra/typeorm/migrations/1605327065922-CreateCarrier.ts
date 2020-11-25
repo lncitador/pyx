@@ -16,6 +16,11 @@ export default class CreateCarrier1605327065922 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
+            isNullable: true,
+          },
+          {
+            name: 'cnpj',
+            type: 'varchar',
             isUnique: true,
           },
           {
@@ -29,7 +34,7 @@ export default class CreateCarrier1605327065922 implements MigrationInterface {
             isNullable: true,
           },
           {
-            name: 'adress',
+            name: 'address',
             type: 'varchar',
             isNullable: true,
           },

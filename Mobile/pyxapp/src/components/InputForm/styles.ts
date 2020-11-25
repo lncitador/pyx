@@ -2,34 +2,30 @@ import styled, { css } from 'styled-components/native';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
 interface ContainerProps {
+  width: number;
+}
+
+interface InputViewProps {
   isFocused: boolean;
   isErrored: boolean;
 }
 
-export const Container = styled.View`
-  width: 100%;
+export const Container = styled.View<ContainerProps>`
   margin-bottom: 8px;
-
-  flex-direction: column;
-  align-items: flex-start;
+  ${(props) =>
+    props.width &&
+    css`
+      width: ${props.width}%;
+    `};
 `;
 
-export const InputContainer = styled.View`
-  flex-direction: row;
-`;
-
-export const InputView = styled.View<ContainerProps>`
-  width: 100%;
-  height: 50px;
+export const InputView = styled.View<InputViewProps>`
+  height: 42px;
   padding: 0 16px;
-  background: #344955;
+  background: #232f34;
   border-radius: 10px;
-  margin-bottom: 8px;
   border-width: 2px;
-  border-color: #344955;
-
-  flex-direction: row;
-  align-items: center;
+  border-color: #4a6572;
 
   ${(props) =>
     props.isErrored &&
@@ -40,7 +36,7 @@ export const InputView = styled.View<ContainerProps>`
   ${(props) =>
     props.isFocused &&
     css`
-      border-color: #4a6572;
+      border-color: #9bb5c0;
     `}
 `;
 
@@ -53,7 +49,6 @@ export const TextInput = styled.TextInput`
 
 export const Label = styled.Text`
   width: 100%;
-  margin-bottom: 8px;
   font-family: Roboto;
   color: #9bb5c0;
   font-size: 14px;

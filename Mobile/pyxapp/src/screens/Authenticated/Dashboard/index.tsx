@@ -1,16 +1,22 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { View, Button } from 'react-native';
+import { Button } from 'react-native';
+import Header from '../../../components/Header';
 
 import { useAuth } from '../../../hooks/auth';
-// import { Container } from './styles';yarn
+import Survey from './pages/Survey';
+import { Container } from './styles';
 
 const Dashboard: React.FC = () => {
   const { singOut } = useAuth();
   return (
-    <View style={{ flex: 1, justifyContent: 'center' }}>
-      <Button title="Sair" onPress={singOut} />
-    </View>
+    <>
+      <Header />
+      <Container>
+        <Survey />
+        <Button title="Sair" onPress={singOut} />
+      </Container>
+    </>
   );
 };
 

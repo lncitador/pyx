@@ -5,8 +5,8 @@
     "license": "MIT",
     "scripts": {
         "build": "tsc",
-        "dev:server": "ts-node-dev -r tsconfig-paths/register --transpile-only --ignore-watch node_modules ./src/shared/infra/http/server.ts",
-        "start": "ts-node-dev -r tsconfig-paths/register ./src/shared/infra/http/server.ts",
+        "dev:server": "POSTGRES_HOST=localhost ts-node-dev -r tsconfig-paths/register --transpile-only --ignore-watch node_modules ./src/shared/infra/http/server.ts",
+        "start": "POSTGRES_HOST=pyxmobile ts-node-dev -r tsconfig-paths/register ./src/shared/infra/http/server.ts",
         "typeorm": "ts-node-dev -r tsconfig-paths/register ./node_modules/typeorm/cli.js"
     },
     "devDependencies": {
@@ -29,8 +29,10 @@
         "typescript": "^4.0.5"
     },
     "dependencies": {
+        "axios": "^0.21.0",
         "bcryptjs": "^2.4.3",
         "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
         "express": "^4.17.1",
         "express-async-errors": "^3.1.1",
         "jsonwebtoken": "^8.5.1",

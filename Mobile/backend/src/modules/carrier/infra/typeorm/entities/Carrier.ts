@@ -15,7 +15,10 @@ class Carrier {
   id: string;
 
   @Column()
-  name: string;
+  name?: string;
+
+  @Column()
+  cnpj: string;
 
   @Column()
   responsible?: string;
@@ -26,11 +29,11 @@ class Carrier {
   @Column()
   email?: string;
 
-  @Column()
-  adress?: string;
+  @Column('json')
+  address?: string;
 
-  @Column('integer')
-  phone?: number;
+  @Column()
+  phone?: string;
 
   @CreateDateColumn()
   created_at?: Date;
