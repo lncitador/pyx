@@ -17,6 +17,7 @@ interface InputProps extends TextInputProps {
   icon?: string;
   label?: string;
   width: number;
+  disabled?: boolean;
 }
 
 interface InputValueReference {
@@ -28,7 +29,7 @@ interface InputRef {
 }
 
 const InputForm: React.ForwardRefRenderFunction<InputRef, InputProps> = (
-  { name, icon, label, width, ...rest },
+  { name, icon, label, width, disabled, ...rest },
   ref,
 ) => {
   const inputElementRef = useRef<any>(null);
@@ -73,7 +74,10 @@ const InputForm: React.ForwardRefRenderFunction<InputRef, InputProps> = (
   return (
     <Container width={width}>
       {label ? <Label>{label}</Label> : <></>}
-      <InputView isFocused={isFocused} isErrored={!!error}>
+      <InputView
+        isDisabled={disabled ? disabled : (disabled = false)}
+        isFocused={isFocused}
+        isErrored={!!error}>
         {icon ? (
           <Icon
             name={icon}

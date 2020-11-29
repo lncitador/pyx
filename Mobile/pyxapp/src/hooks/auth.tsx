@@ -23,6 +23,7 @@ interface AuthContextData {
   user: object;
   vehicle: VehicleResponseData;
   loading: boolean;
+  findPlateErrorStatus: 400;
   singIn(credentials: SingInCredentials): Promise<void>;
   singOut(): void;
   findPlate(plate: string): Promise<void>;
@@ -80,26 +81,18 @@ export const AuthUser: React.FC = ({ children }) => {
     setData({ token, user });
   }, []);
 
-  const findPlate = useCallback(async (plate) => {
+  const findPlate = useCallback(async (plate: string) => {
     const vehicle = await mobile.get<VehicleResponseData>(`vehicle/${plate}`);
-
     const { driver, carrier } = vehicle.data;
 
-    await AsyncStorage.multiSet([
-      ['@PyxApp:plate', plate],
-      ['@PyxApp:driver', driver],
-      ['@PyxApp:carrier', JSON.stringify(carrier)],
-    ]);
+    // await AsyncStorage.multiSet([
+    //   ['@PyxApp:plate', plate],
+    //   ['@PyxApp:driver', driver],
+    //   ['@PyxApp:carrier', JSON.stringify(carrier)],
+    // ]);
 
     setSurvey({ plate, driver, carrier });
-    // const [getPlate, getDriver, getCarrier] = await AsyncStorage.multiGet([
-    //   '@PyxApp:plate',
-    //   '@PyxApp:driver',
-    //   '@PyxApp:carrier',
-    // ]);
-    console.log(carrier);
   }, []);
-
   const singOut = useCallback(async () => {
     await AsyncStorage.multiRemove(['@PyxApp:token', '@PyxApp:user']);
 
@@ -111,6 +104,7 @@ export const AuthUser: React.FC = ({ children }) => {
       value={{
         user: data.user,
         vehicle: survey,
+        findPlateErrorStatus: 400,
         loading,
         singIn,
         singOut,

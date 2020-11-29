@@ -8,6 +8,7 @@ interface ContainerProps {
 interface InputViewProps {
   isFocused: boolean;
   isErrored: boolean;
+  isDisabled: boolean;
 }
 
 export const Container = styled.View<ContainerProps>`
@@ -37,6 +38,13 @@ export const InputView = styled.View<InputViewProps>`
     props.isFocused &&
     css`
       border-color: #9bb5c0;
+    `}
+
+    ${(props) =>
+    props.isDisabled &&
+    css`
+      background-color: #344955;
+      border-color: #232f34;
     `}
 `;
 
