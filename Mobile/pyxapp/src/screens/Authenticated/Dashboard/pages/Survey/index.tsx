@@ -73,6 +73,7 @@ const Survey: React.FC = () => {
     formRef.current?.setFieldValue('Transportadora', carrierName);
     console.log(carrier.id);
   };
+
   const handleSearchPlateSubmit = useCallback(
     async (data: PlateInFormData) => {
       try {
