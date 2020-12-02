@@ -5,10 +5,11 @@ interface AddresData {
   county?: string;
   neighborhood?: string;
   street?: string;
-  number?: number;
+  num?: string;
   cep?: string;
 }
 export interface CarrierResponseData {
+  id: string;
   name?: string;
   cnpj: string;
   responsible?: string;
@@ -16,10 +17,17 @@ export interface CarrierResponseData {
   phone?: string;
   address?: AddresData;
 }
+
 export interface VehicleResponseData {
+  id?: string;
   plate: string;
   driver: string;
-  carrier: CarrierResponseData;
+  carrier_id: string;
+}
+export interface VehicleData {
+  plate?: string;
+  driver?: string;
+  carrier?: CarrierResponseData;
 }
 
 export const pyxapi = axios.create({

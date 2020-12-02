@@ -11,8 +11,9 @@ import AsyncStorage from '@react-native-community/async-storage';
 import {
   mobile,
   pyxapi,
-  VehicleResponseData,
+  VehicleData,
   CarrierResponseData,
+  VehicleResponseData,
 } from '../services/UseApi';
 
 interface SingInCredentials {
@@ -21,12 +22,18 @@ interface SingInCredentials {
 }
 interface AuthContextData {
   user: object;
-  vehicle: VehicleResponseData;
+  vehicle: VehicleData;
   loading: boolean;
   findPlateErrorStatus: 400;
   singIn(credentials: SingInCredentials): Promise<void>;
   singOut(): void;
   findPlate(plate: string): Promise<void>;
+  saveVehicle(
+    plate: string,
+    driver: string,
+    carrier_id: string,
+  ): Promise<VehicleResponseData>;
+  getCarrier(id: string): Promise<void>;
 }
 
 interface AuthState {
@@ -35,9 +42,9 @@ interface AuthState {
 }
 
 interface SurveyState {
-  plate: string;
-  driver: string;
-  carrier: CarrierResponseData;
+  plate?: string;
+  driver?: string;
+  carrier?: CarrierResponseData;
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
@@ -82,17 +89,43 @@ export const AuthUser: React.FC = ({ children }) => {
   }, []);
 
   const findPlate = useCallback(async (plate: string) => {
-    const vehicle = await mobile.get<VehicleResponseData>(`vehicle/${plate}`);
+    const vehicle = await mobile.get<VehicleData>(`vehicle/${plate}`);
     const { driver, carrier } = vehicle.data;
 
-    // await AsyncStorage.multiSet([
-    //   ['@PyxApp:plate', plate],
-    //   ['@PyxApp:driver', driver],
-    //   ['@PyxApp:carrier', JSON.stringify(carrier)],
-    // ]);
+    if (carrier) {
+      carrier.phone = String(carrier.phone);
+      carrier.address?.num
+        ? (carrier.address.num = String(carrier.address.num))
+        : carrier.address?.num;
+    }
 
     setSurvey({ plate, driver, carrier });
   }, []);
+
+  const saveVehicle = useCallback(
+    async (plate: string, driver: string, carrier_id: string) => {
+      const vehicle = await mobile.post<VehicleResponseData>('vehicle', {
+        plate,
+        driver,
+        carrier_id,
+      });
+
+      return vehicle.data;
+    },
+    [],
+  );
+
+  const getCarrier = useCallback(async (id: string) => {
+    const { data } = await mobile.get<CarrierResponseData>(`carrier/${id}`);
+
+    data.phone = String(data.phone);
+    data.address?.num
+      ? (data.address.num = String(data.address.num))
+      : data.address?.num;
+
+    setSurvey({ carrier: data });
+  }, []);
+
   const singOut = useCallback(async () => {
     await AsyncStorage.multiRemove(['@PyxApp:token', '@PyxApp:user']);
 
@@ -109,6 +142,8 @@ export const AuthUser: React.FC = ({ children }) => {
         singIn,
         singOut,
         findPlate,
+        saveVehicle,
+        getCarrier,
       }}>
       {children}
     </AuthContext.Provider>

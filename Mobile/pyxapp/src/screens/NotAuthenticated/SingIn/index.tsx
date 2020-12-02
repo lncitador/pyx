@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-native/no-inline-styles */
 import React, { useCallback, useRef } from 'react';
 import {
@@ -30,8 +31,6 @@ interface SingInFormData {
 
 const SingIn: React.FC = () => {
   const { singIn, user } = useAuth();
-
-  console.log(user);
 
   const passwordInputRef = useRef<TextInput>(null);
   const formRef = useRef<FormHandles>(null);
