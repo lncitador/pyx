@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { Form } from '@unform/mobile';
@@ -18,13 +17,14 @@ import {
 
 import getValidationErrors from '../../../../../utils/getValidationError';
 
-import InputForm from '../../../../../components/InputForm';
-import RectButtonForm from '../../../../../components/RectButtonForm';
-import PickerSelect from '../../../../../components/PickerForm';
-import { useAuth } from '../../../../../hooks/auth';
-import Popups from '../../../../../components/Popup';
-import Button from '../../../../../components/Button';
-import { VehicleResponseData } from '../../../../../services/UseApi';
+import {
+  InputForm,
+  Button,
+  PickerSelect,
+  Popups,
+  RectButtonForm,
+} from '../../../../../components';
+import { useApi } from '../../../../../hooks/api';
 
 interface PlateInFormData {
   plate: string;
@@ -48,9 +48,9 @@ const Survey: React.FC = () => {
     },
   ];
 
-  const { findPlate, saveVehicle, getCarrier, vehicle } = useAuth();
-  const formRef = useRef<FormHandles>(null);
-  const formContinueRef = useRef<FormHandles>(null);
+  const { findPlate, saveVehicle, getCarrier, vehicle, changeStack } = useApi();
+  const formSearchRef = useRef<FormHandles>(null);
+  const formSeaatchedRef = useRef<FormHandles>(null);
   const formNewVehicleRef = useRef<FormHandles>(null);
 
   const [messageError, setMessageError] = useState('');
@@ -58,15 +58,11 @@ const Survey: React.FC = () => {
   const [searched, setSearched] = useState(false);
   const [plate, setPlate] = useState('');
   const [loadCarrier, setLoadCarrier] = useState(false);
-  const [vehicleSurvey, setVehicleSurvey] = useState<VehicleResponseData>(
-    {} as VehicleResponseData,
-  );
-  const [survey, setSurvey] = useState(false);
 
   const onSelectChange = async (value: string) => {
     const carrier = carriers.find((e) => e.id === value);
     if (!carrier) {
-      formRef.current?.setFieldValue('Transportadora', '');
+      formSearchRef.current?.setFieldValue('Transportadora', '');
       setLoadCarrier(false);
 
       return;
@@ -74,7 +70,7 @@ const Survey: React.FC = () => {
 
     const carrierName = carrier.name;
 
-    formRef.current?.setFieldValue('Transportadora', carrierName);
+    formSearchRef.current?.setFieldValue('Transportadora', carrierName);
 
     await getCarrier(carrier.id);
     setLoadCarrier(true);
@@ -84,7 +80,7 @@ const Survey: React.FC = () => {
     async (data: PlateInFormData) => {
       try {
         setMessageError('');
-        formRef.current?.setErrors({});
+        formSearchRef.current?.setErrors({});
 
         const schema = Yup.object().shape({
           plate: Yup.string()
@@ -103,7 +99,7 @@ const Survey: React.FC = () => {
         vehicle.plate = plate;
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
-          formRef.current?.setErrors(errors);
+          formSearchRef.current?.setErrors(errors);
           setSearched(false);
           setPlate('');
 
@@ -116,9 +112,8 @@ const Survey: React.FC = () => {
 
         if (data.plate.length === 7) {
           setPlate(data.plate);
+          vehicle.driver = '';
         }
-
-        console.log(vehicle);
 
         setMessageError('');
         setSearchFounded(false);
@@ -142,14 +137,14 @@ const Survey: React.FC = () => {
           abortEarly: false,
         });
 
-        const { plate, driver, carrier_id } = data;
+        const { driver, carrier_id } = data;
 
-        // console.log(data);
+        const vehicleSaved = await saveVehicle({ carrier_id, plate, driver });
 
-        const vehicleSaved = await saveVehicle(plate, driver, carrier_id);
-
-        setVehicleSurvey(vehicleSaved);
-        setSurvey(true);
+        if (vehicleSaved) {
+          await findPlate(vehicleSaved.plate);
+          changeStack();
+        }
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
           const errors = getValidationErrors(err);
@@ -157,8 +152,12 @@ const Survey: React.FC = () => {
         }
       }
     },
-    [saveVehicle],
+    [changeStack, findPlate, plate, saveVehicle],
   );
+
+  const handleSurveyStack = useCallback(() => {
+    changeStack();
+  }, [changeStack]);
 
   return (
     <>
@@ -170,7 +169,7 @@ const Survey: React.FC = () => {
           contentContainerStyle={{ flex: 1 }}
           keyboardShouldPersistTaps="handled">
           <Container>
-            <Form ref={formRef} onSubmit={handleSearchPlateSubmit}>
+            <Form ref={formSearchRef} onSubmit={handleSearchPlateSubmit}>
               <PlateSearchContainer>
                 <InputForm
                   maxLength={7}
@@ -183,7 +182,7 @@ const Survey: React.FC = () => {
                 <RectButtonForm
                   icon={'search'}
                   onPress={() => {
-                    formRef.current?.submitForm();
+                    formSearchRef.current?.submitForm();
                   }}
                 />
               </PlateSearchContainer>
@@ -195,9 +194,9 @@ const Survey: React.FC = () => {
             </Form>
             {searchFounded ? (
               <Form
-                ref={formContinueRef}
+                ref={formSeaatchedRef}
                 initialData={vehicle}
-                onSubmit={handleNewSurveySubmit}>
+                onSubmit={handleSurveyStack}>
                 <PlateContainer>
                   <InputForm
                     autoCorrect={false}
@@ -323,7 +322,7 @@ const Survey: React.FC = () => {
                 <Button
                   style={{ backgroundColor: '#3D8B5C' }}
                   onPress={() => {
-                    formContinueRef.current?.submitForm();
+                    formSeaatchedRef.current?.submitForm();
                   }}>
                   Fazer Vistoria
                 </Button>
@@ -491,7 +490,6 @@ const Survey: React.FC = () => {
             ) : (
               <></>
             )}
-            {survey ? <></> : <></>}
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>

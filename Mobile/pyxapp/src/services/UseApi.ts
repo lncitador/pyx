@@ -25,9 +25,9 @@ export interface VehicleResponseData {
   carrier_id: string;
 }
 export interface VehicleData {
-  plate?: string;
-  driver?: string;
-  carrier?: CarrierResponseData;
+  plate: string;
+  driver: string;
+  carrier: CarrierResponseData;
 }
 
 export const pyxapi = axios.create({
