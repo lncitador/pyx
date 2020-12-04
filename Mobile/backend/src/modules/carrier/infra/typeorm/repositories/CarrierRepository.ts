@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 import ICreatedCarrierDTO from '@modules/carrier/dtos/ICreateCarrierDTO';
 import ICarrierRepository from '@modules/carrier/repositories/ICarrierRepository';
+import AppError from '@shared/errors/AppError';
 import { getRepository, Repository } from 'typeorm';
 import Carrier from '../entities/Carrier';
 
@@ -9,6 +10,20 @@ export default class CarrierRepository implements ICarrierRepository {
 
   constructor() {
     this.ormRepository = getRepository(Carrier);
+  }
+
+  public async IndexCarrier(id: string): Promise<Carrier | undefined> {
+    const carrier = await this.ormRepository.findOne({ where: { id } });
+
+    if (carrier) {
+      if (carrier.address) {
+        carrier.address = JSON.parse(carrier.address);
+      }
+    } else {
+      throw new AppError('Carrier not exist');
+    }
+
+    return carrier;
   }
 
   public async showCarriers(): Promise<Carrier[]> {

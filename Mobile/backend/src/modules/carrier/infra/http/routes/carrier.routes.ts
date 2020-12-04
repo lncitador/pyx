@@ -5,6 +5,7 @@ const carrierControllers = new CarrierControllers();
 const carrierRouter = Router();
 
 carrierRouter.post('/', carrierControllers.create);
+carrierRouter.get('/:id', carrierControllers.index);
 carrierRouter.get('/', carrierControllers.show);
 
 export default carrierRouter;

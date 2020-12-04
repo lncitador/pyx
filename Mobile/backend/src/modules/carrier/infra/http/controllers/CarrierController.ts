@@ -6,6 +6,16 @@ import IResponseCarrierDTO from '@modules/carrier/dtos/IResponseCarrierDTO';
 import CarrierRepository from '../../typeorm/repositories/CarrierRepository';
 
 export default class CarrierController {
+  public async index(request: Request, response: Response): Promise<Response> {
+    const carrierRepository = container.resolve(CarrierRepository);
+
+    const { id } = request.params;
+
+    const carrier = await carrierRepository.IndexCarrier(id);
+
+    return response.json(carrier);
+  }
+
   public async show(request: Request, response: Response): Promise<Response> {
     const carrierRepository = container.resolve(CarrierRepository);
 
