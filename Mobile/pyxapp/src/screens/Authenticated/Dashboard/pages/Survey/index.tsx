@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 
 import { Form } from '@unform/mobile';
@@ -24,6 +24,7 @@ import {
   Popups,
   RectButtonForm,
 } from '../../../../../components';
+import { useNavigation } from '@react-navigation/native';
 import { useApi } from '../../../../../hooks/api';
 
 interface PlateInFormData {
@@ -37,6 +38,7 @@ interface VehicleInFormData {
 }
 
 const Survey: React.FC = () => {
+  const navigate = useNavigation();
   const carriers = [
     {
       id: '1aa57bb2-d2b7-47cc-b707-c326342235f5',
@@ -48,7 +50,14 @@ const Survey: React.FC = () => {
     },
   ];
 
-  const { findPlate, saveVehicle, getCarrier, vehicle, changeStack } = useApi();
+  const {
+    findPlate,
+    saveVehicle,
+    getCarrier,
+    vehicle,
+    survey,
+    changeSurvey,
+  } = useApi();
   const formSearchRef = useRef<FormHandles>(null);
   const formSeaatchedRef = useRef<FormHandles>(null);
   const formNewVehicleRef = useRef<FormHandles>(null);
@@ -72,7 +81,12 @@ const Survey: React.FC = () => {
 
     formSearchRef.current?.setFieldValue('Transportadora', carrierName);
 
-    await getCarrier(carrier.id);
+    const carrierResponse = await getCarrier(carrier.id);
+
+    if (carrierResponse) {
+      vehicle.carrier = carrierResponse;
+      vehicle.plate = plate;
+    }
     setLoadCarrier(true);
   };
 
@@ -124,7 +138,6 @@ const Survey: React.FC = () => {
 
   const handleNewSurveySubmit = useCallback(
     async (data: VehicleInFormData) => {
-      console.log(data);
       try {
         setMessageError('');
         formNewVehicleRef.current?.setErrors({});
@@ -143,7 +156,8 @@ const Survey: React.FC = () => {
 
         if (vehicleSaved) {
           await findPlate(vehicleSaved.plate);
-          changeStack();
+          navigate.navigate('Survey');
+          changeSurvey();
         }
       } catch (err) {
         if (err instanceof Yup.ValidationError) {
@@ -152,12 +166,20 @@ const Survey: React.FC = () => {
         }
       }
     },
-    [changeStack, findPlate, plate, saveVehicle],
+    [changeSurvey, findPlate, navigate, plate, saveVehicle],
   );
 
   const handleSurveyStack = useCallback(() => {
-    changeStack();
-  }, [changeStack]);
+    navigate.navigate('Survey');
+    changeSurvey();
+  }, [changeSurvey, navigate]);
+
+  useEffect(() => {
+    if (survey) {
+      setSearchFounded(false);
+      setSearched(false);
+    }
+  }, [survey]);
 
   return (
     <>
@@ -192,7 +214,7 @@ const Survey: React.FC = () => {
                 <></>
               )}
             </Form>
-            {searchFounded ? (
+            {searchFounded && !survey ? (
               <Form
                 ref={formSeaatchedRef}
                 initialData={vehicle}
@@ -330,7 +352,7 @@ const Survey: React.FC = () => {
             ) : (
               <></>
             )}
-            {searched && !searchFounded ? (
+            {searched && !searchFounded && !survey ? (
               <Form
                 ref={formNewVehicleRef}
                 initialData={vehicle}

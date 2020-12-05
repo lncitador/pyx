@@ -1,23 +1,32 @@
-import React from 'react';
-import { Button } from 'react-native';
+import { createStackNavigator } from '@react-navigation/stack';
+import React, { useEffect, useState } from 'react';
 import Header from '../../../components/Header';
 import { useApi } from '../../../hooks/api';
-
-import { useAuth } from '../../../hooks/auth';
 import Survey from './pages/Survey';
-import SurveyStack from './pages/Survey/SurveyStack/';
-import { Container } from './styles';
+import SurveyStack from './pages/Survey/SurveyStack';
 
 const Dashboard: React.FC = () => {
-  const { singOut } = useAuth();
-  const { stack } = useApi();
+  const { vehicle, survey } = useApi();
+
+  const [title, setTitle] = useState('');
+
+  const DashboardStack = createStackNavigator();
+
+  useEffect(() => {
+    setTitle(survey ? vehicle.plate : 'Vistoria');
+  }, [survey, vehicle.plate]);
+
   return (
     <>
-      <Header />
-      <Container>
-        {stack ? <SurveyStack /> : <Survey />}
-        <Button title="Sair" onPress={singOut} />
-      </Container>
+      <Header title={title} back={!survey} />
+      <DashboardStack.Navigator
+        screenOptions={{
+          headerShown: false,
+          cardStyle: { backgroundColor: '#344955' },
+        }}>
+        <DashboardStack.Screen name="FindPlate" component={Survey} />
+        <DashboardStack.Screen name="Survey" component={SurveyStack} />
+      </DashboardStack.Navigator>
     </>
   );
 };
