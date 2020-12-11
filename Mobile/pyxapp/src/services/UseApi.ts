@@ -9,13 +9,39 @@ interface AddresData {
   cep?: string;
 }
 export interface CarrierResponseData {
-  id: string;
+  id?: string;
   name?: string;
   cnpj: string;
   responsible?: string;
   email?: string;
   phone?: string;
   address?: AddresData;
+}
+
+export interface CarrierDTO {
+  name?: string;
+  cnpj: string;
+  responsible?: string;
+  email?: string;
+  phone?: string;
+  address?: AddresData;
+}
+interface QsaData {
+  nome: string;
+}
+
+export interface ReceitaWsResponseData {
+  nome: string;
+  cnpj: string;
+  qsa: QsaData[];
+  email?: string;
+  telefone?: string;
+  uf?: string;
+  municipio?: string;
+  bairro?: string;
+  logradouro?: string;
+  numero?: string;
+  cep?: string;
 }
 
 export interface VehicleResponseData {
@@ -41,9 +67,3 @@ export const mobile = axios.create({
 export const receitaws = axios.create({
   baseURL: 'https://www.receitaws.com.br/v1/cnpj/',
 });
-
-export const findCnpj = async (cnpj: string) => {
-  const carrier = await receitaws.get(`/${cnpj}`);
-
-  console.log(carrier);
-};

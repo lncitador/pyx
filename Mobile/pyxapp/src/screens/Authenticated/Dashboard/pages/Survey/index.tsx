@@ -31,6 +31,10 @@ interface PlateInFormData {
   plate: string;
 }
 
+interface CarrierInFormData {
+  cnpj: string;
+}
+
 interface VehicleInFormData {
   plate: string;
   driver: string;
@@ -41,11 +45,11 @@ const Survey: React.FC = () => {
   const navigate = useNavigation();
   const carriers = [
     {
-      id: '1aa57bb2-d2b7-47cc-b707-c326342235f5',
+      id: '0d4516d1-95ce-472f-b1b5-9589d8d2c8a5',
       name: 'retira',
     },
     {
-      id: 'c3e856c1-7475-406f-95fa-683a064c1884',
+      id: '59b11662-fcde-4b4f-a70e-12e58f8352f8',
       name: 'retira1',
     },
   ];
@@ -54,19 +58,26 @@ const Survey: React.FC = () => {
     findPlate,
     saveVehicle,
     getCarrier,
+    createCarrier,
+    findCarrier,
     vehicle,
     survey,
     changeSurvey,
   } = useApi();
+
   const formSearchRef = useRef<FormHandles>(null);
-  const formSeaatchedRef = useRef<FormHandles>(null);
+  const formSearchedRef = useRef<FormHandles>(null);
   const formNewVehicleRef = useRef<FormHandles>(null);
+  const formSearchCarrierRef = useRef<FormHandles>(null);
 
   const [messageError, setMessageError] = useState('');
   const [searchFounded, setSearchFounded] = useState(false);
   const [searched, setSearched] = useState(false);
   const [plate, setPlate] = useState('');
+  const [cnpj, setCnpj] = useState('');
   const [loadCarrier, setLoadCarrier] = useState(false);
+
+  console.log(cnpj);
 
   const onSelectChange = async (value: string) => {
     const carrier = carriers.find((e) => e.id === value);
@@ -136,8 +147,76 @@ const Survey: React.FC = () => {
     [findPlate, plate, vehicle],
   );
 
+  const handleSearchCarrierSubmit = useCallback(
+    async (data: CarrierInFormData) => {
+      try {
+        setMessageError('');
+        formSearchRef.current?.setErrors({});
+
+        const schema = Yup.object().shape({
+          cnpj: Yup.string()
+            .min(14, 'o CNPJ tem que ter no minimo 14 caracteres')
+            .required('Digite um CNPJ válido'),
+        });
+
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        vehicle.driver = formNewVehicleRef.current?.getFieldValue('driver');
+        vehicle.plate = plate;
+        vehicle.carrier = await findCarrier(data.cnpj);
+
+        setSearchFounded(false);
+        setLoadCarrier(true);
+
+        const responseCarrier = await createCarrier(vehicle.carrier);
+
+        if (!responseCarrier.id) {
+          return;
+        }
+
+        console.log(responseCarrier.id);
+
+        formNewVehicleRef.current?.setFieldValue(
+          'carrier_id',
+          responseCarrier.id,
+        );
+      } catch (err) {
+        if (err instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(err);
+          formSearchRef.current?.setErrors(errors);
+          setSearched(false);
+          setCnpj('');
+
+          setMessageError(
+            err.errors.length === 2 ? err.errors[1] : err.message,
+          );
+        } else {
+          setSearched(true);
+        }
+
+        if (data.cnpj.length === 14) {
+          setCnpj(data.cnpj);
+        }
+
+        setMessageError('');
+        setSearchFounded(false);
+      }
+    },
+    [
+      createCarrier,
+      findCarrier,
+      plate,
+      vehicle.carrier,
+      vehicle.driver,
+      vehicle.plate,
+    ],
+  );
+
   const handleNewSurveySubmit = useCallback(
     async (data: VehicleInFormData) => {
+      console.log(data);
       try {
         setMessageError('');
         formNewVehicleRef.current?.setErrors({});
@@ -152,7 +231,11 @@ const Survey: React.FC = () => {
 
         const { driver, carrier_id } = data;
 
-        const vehicleSaved = await saveVehicle({ carrier_id, plate, driver });
+        const vehicleSaved = await saveVehicle({
+          carrier_id,
+          plate,
+          driver,
+        });
 
         if (vehicleSaved) {
           await findPlate(vehicleSaved.plate);
@@ -216,7 +299,7 @@ const Survey: React.FC = () => {
             </Form>
             {searchFounded && !survey ? (
               <Form
-                ref={formSeaatchedRef}
+                ref={formSearchedRef}
                 initialData={vehicle}
                 onSubmit={handleSurveyStack}>
                 <PlateContainer>
@@ -344,7 +427,7 @@ const Survey: React.FC = () => {
                 <Button
                   style={{ backgroundColor: '#3D8B5C' }}
                   onPress={() => {
-                    formSeaatchedRef.current?.submitForm();
+                    formSearchedRef.current?.submitForm();
                   }}>
                   Fazer Vistoria
                 </Button>
@@ -505,7 +588,28 @@ const Survey: React.FC = () => {
                       <View style={{ height: 32 }} />
                     </CarrierContainer>
                   ) : (
-                    <></>
+                    <Form
+                      ref={formSearchCarrierRef}
+                      onSubmit={handleSearchCarrierSubmit}>
+                      <Popups style={{ backgroundColor: '#3D8B5C' }}>
+                        ou adicione um CNPJ abaixo
+                      </Popups>
+                      <CarrierSearchContainer>
+                        <InputForm
+                          maxLength={14}
+                          keyboardType="number-pad"
+                          label="CNPJ"
+                          name="cnpj"
+                          width={81}
+                        />
+                        <RectButtonForm
+                          icon={'search'}
+                          onPress={() => {
+                            formSearchCarrierRef.current?.submitForm();
+                          }}
+                        />
+                      </CarrierSearchContainer>
+                    </Form>
                   )}
                 </CarrierContainer>
               </Form>

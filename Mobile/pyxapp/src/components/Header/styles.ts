@@ -5,7 +5,7 @@ export const Container = styled.View`
   flex: 1;
   padding-top: 42px;
   padding-bottom: 16px;
-  max-height: 92px;
+  max-height: 102px;
   background-color: #232f34;
 `;
 

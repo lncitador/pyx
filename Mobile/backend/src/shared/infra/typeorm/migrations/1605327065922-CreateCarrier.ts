@@ -40,7 +40,7 @@ export default class CreateCarrier1605327065922 implements MigrationInterface {
           },
           {
             name: 'phone',
-            type: 'integer',
+            type: 'varchar',
             isNullable: true,
           },
           {

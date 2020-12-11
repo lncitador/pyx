@@ -3,6 +3,6 @@ export default interface IAddress {
   county?: string;
   neighborhood?: string;
   street?: string;
-  number?: number;
+  number?: string;
   cep?: string;
 }
