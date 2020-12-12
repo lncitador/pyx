@@ -20,7 +20,6 @@ import getValidationErrors from '../../../../../utils/getValidationError';
 import {
   InputForm,
   Button,
-  PickerSelect,
   Popups,
   RectButtonForm,
 } from '../../../../../components';
@@ -43,21 +42,10 @@ interface VehicleInFormData {
 
 const Survey: React.FC = () => {
   const navigate = useNavigation();
-  const carriers = [
-    {
-      id: '0d4516d1-95ce-472f-b1b5-9589d8d2c8a5',
-      name: 'retira',
-    },
-    {
-      id: '59b11662-fcde-4b4f-a70e-12e58f8352f8',
-      name: 'retira1',
-    },
-  ];
 
   const {
     findPlate,
     saveVehicle,
-    getCarrier,
     createCarrier,
     findCarrier,
     vehicle,
@@ -78,28 +66,6 @@ const Survey: React.FC = () => {
   const [loadCarrier, setLoadCarrier] = useState(false);
 
   console.log(cnpj);
-
-  const onSelectChange = async (value: string) => {
-    const carrier = carriers.find((e) => e.id === value);
-    if (!carrier) {
-      formSearchRef.current?.setFieldValue('Transportadora', '');
-      setLoadCarrier(false);
-
-      return;
-    }
-
-    const carrierName = carrier.name;
-
-    formSearchRef.current?.setFieldValue('Transportadora', carrierName);
-
-    const carrierResponse = await getCarrier(carrier.id);
-
-    if (carrierResponse) {
-      vehicle.carrier = carrierResponse;
-      vehicle.plate = plate;
-    }
-    setLoadCarrier(true);
-  };
 
   const handleSearchPlateSubmit = useCallback(
     async (data: PlateInFormData) => {
@@ -463,15 +429,25 @@ const Survey: React.FC = () => {
                 </PlateContainer>
                 <CarrierContainer>
                   <CarrierSearchContainer>
-                    <PickerSelect
-                      name="carrier_id"
-                      label="Transportadora"
-                      onValueChange={onSelectChange}
-                      items={carriers.map((e) => ({
-                        value: e.id,
-                        label: e.name,
-                      }))}
-                    />
+                    <Form
+                      ref={formSearchCarrierRef}
+                      onSubmit={handleSearchCarrierSubmit}>
+                      <CarrierSearchContainer>
+                        <InputForm
+                          maxLength={14}
+                          keyboardType="number-pad"
+                          label="CNPJ"
+                          name="cnpj"
+                          width={81}
+                        />
+                        <RectButtonForm
+                          icon={'search'}
+                          onPress={() => {
+                            formSearchCarrierRef.current?.submitForm();
+                          }}
+                        />
+                      </CarrierSearchContainer>
+                    </Form>
                   </CarrierSearchContainer>
                   {loadCarrier ? (
                     <CarrierContainer>
@@ -588,28 +564,7 @@ const Survey: React.FC = () => {
                       <View style={{ height: 32 }} />
                     </CarrierContainer>
                   ) : (
-                    <Form
-                      ref={formSearchCarrierRef}
-                      onSubmit={handleSearchCarrierSubmit}>
-                      <Popups style={{ backgroundColor: '#3D8B5C' }}>
-                        ou adicione um CNPJ abaixo
-                      </Popups>
-                      <CarrierSearchContainer>
-                        <InputForm
-                          maxLength={14}
-                          keyboardType="number-pad"
-                          label="CNPJ"
-                          name="cnpj"
-                          width={81}
-                        />
-                        <RectButtonForm
-                          icon={'search'}
-                          onPress={() => {
-                            formSearchCarrierRef.current?.submitForm();
-                          }}
-                        />
-                      </CarrierSearchContainer>
-                    </Form>
+                    <></>
                   )}
                 </CarrierContainer>
               </Form>
